@@ -1,0 +1,29 @@
+en:
+  misc:
+    noname: "Unknown"
+  source:
+    types:
+      profile: "Profile"
+      photo: "Photo"
+      photos: "Photos"
+      photo_album: "Photo album"
+      photo_albums: "Photo albums"
+      video: "Video"
+      post: "Post"
+      event: "Event"
+      moments: "Moments"
+      comment: "Comment"
+      unknown: "Article"
+    service_types:
+      twitter:
+        post: "Tweet"
+    services:
+      facebook: "Facebook"
+      twitter: "Twitter"
+      youtube: "YouTube"
+      flickr: "Flickr"
+      instagram: "Instagram"
+      vimeo: "Vimeo"
+      bitchute: "BitChute"
+      tumblr: "Tumblr"
+      gab: "Gab"

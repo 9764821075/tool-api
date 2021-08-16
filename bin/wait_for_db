@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require_relative '../config/environment'
+
+RETRY_TIMEOUT_IN_SECONDS = 2
+MAX_RETRIES = 60
+
+def db_connection?
+  ActiveRecord::Base.connection.tables
+  true
+rescue
+  false
+end
+
+def wait_for_db(retry_no)
+  if db_connection?
+    puts "Database ready!"
+    exit 0
+  end
+
+  puts "Waiting for database (##{retry_no})"
+  sleep RETRY_TIMEOUT_IN_SECONDS
+end
+
+MAX_RETRIES.times do |count|
+  wait_for_db(count + 1)
+end
+
+puts "Failed waiting for database!"
+exit 1
