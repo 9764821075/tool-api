@@ -1,0 +1,15 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: tool_development
+  pool: 5
+  username: tool
+  password:
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: tool_test
+  pool: 5
+  username: tool
+  password:

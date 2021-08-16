@@ -1,0 +1,17 @@
+# Ignore bundler config.
+/.bundle
+
+# Ignore Node dependencies.
+/node_modules
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore uploaded files in development
+/storage/*
+
+# Ignore env settings
+.env
