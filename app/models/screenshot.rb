@@ -30,7 +30,7 @@ class Screenshot < ApplicationRecord
   private
 
   def set_dimensions_and_color
-    storage_path = Pathname.new(ENV.fetch('FILE_STORAGE_PATH')).join("store")
+    storage_path = Rails.root.join("storage").join("store")
     file_path = storage_path.join(file_id)
 
     image = MiniMagick::Image.open(file_path)

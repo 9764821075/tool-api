@@ -8,20 +8,6 @@ end
 
 Refile.secret_key = "ae6180212d9d363fd6c632f66c78f140cf330d84ae52ead18d17240322db0896ddb458e4127ae5cfccf19ec6879bd6b207c83751b1bd5ee80520d9f72ce09a25"
 
-file_storage_path = Pathname.new(ENV.fetch('FILE_STORAGE_PATH', './tmp'))
-Refile.cache = Refile::Backend::FileSystem.new(file_storage_path.join("cache").to_s)
-Refile.store = Refile::Backend::FileSystem.new(file_storage_path.join("store").to_s)
-
-# if Rails.env.production?
-#   require "refile/s3"
-
-#   aws = {
-#     access_key_id:     ENV.fetch("AWS_ACCESS_KEY_ID"),
-#     secret_access_key: ENV.fetch("AWS_SECRET_ACCESS_KEY"),
-#     region:            ENV.fetch("AWS_REGION"),
-#     bucket:            ENV.fetch("AWS_BUCKET"),
-#   }
-
-#   Refile.cache = Refile::S3.new(prefix: "cache", **aws)
-#   Refile.store = Refile::S3.new(prefix: "store", **aws)
-# end
+storage_path = Rails.root.join("storage")
+Refile.cache = Refile::Backend::FileSystem.new(storage_path.join("cache").to_s)
+Refile.store = Refile::Backend::FileSystem.new(storage_path.join("store").to_s)

@@ -38,7 +38,7 @@ class Pdf < ApplicationRecord
   end
 
   def set_color
-    storage_path = Pathname.new(ENV.fetch('FILE_STORAGE_PATH')).join("store")
+    storage_path = Rails.root.join("storage").join("store")
     file_path = storage_path.join(thumbnail_id)
 
     colors = Miro::DominantColors.new(file_path)
