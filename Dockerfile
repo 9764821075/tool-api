@@ -1,42 +1,75 @@
-FROM ruby:2.7.3-slim-buster
-# FROM ruby:2.7.3-alpine3.12
+# STAGE: builder
+FROM ruby:2.7.3-alpine3.12 as builder
 
-RUN apt-get update -qq \
- && apt-get install -y --no-install-recommends \
-    apt-utils \
-    build-essential \
-    libpq-dev \
-    postgresql-client \
-    libsqlite3-dev \
-    graphicsmagick \
-    imagemagick \
+# Install build packages
+RUN apk update \
+ && apk upgrade \
+ && apk add --no-cache \
+    build-base \
+    tzdata \
+    postgresql-dev \
     git \
- && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+ENV LANG=C.UTF-8
+ENV RAILS_ENV=production
+ENV RAILS_LOG_TO_STDOUT=true
 
 WORKDIR /app
 
-ENV LANG C.UTF-8
-ENV RAILS_ENV=production
-ENV RAILS_SERVE_STATIC_FILES=true
-ENV RAILS_LOG_TO_STDOUT=true
-
+# Install Ruby gems
 COPY .ruby-version .
 COPY Gemfile .
 COPY Gemfile.lock .
-RUN bundle config --global frozen 1
-RUN bundle install --without development test
+RUN bundle config --local frozen 1 \
+ && bundle config --local jobs 4 \
+ && bundle config --local without development:test \
+ && bundle config --local path /app/vendor \
+ && bundle install
 
+
+# STAGE: final
+FROM ruby:2.7.3-alpine3.12
+
+# Install runtime packages
+RUN apk update \
+ && apk upgrade \
+ && apk add --no-cache \
+    libpq \
+    tzdata \
+    graphicsmagick \
+ && rm -rf /var/lib/apt/lists/*
+
+# Add non-root user
+RUN addgroup -S appgroup \
+ && adduser -S appuser -G appgroup
+
+USER appuser
+WORKDIR /app
+
+ENV LANG=C.UTF-8
+ENV RAILS_ENV=production
+ENV RAILS_LOG_TO_STDOUT=true
+
+# Setup ruby gems
+COPY --chown=appuser .ruby-version .
+COPY --chown=appuser Gemfile .
+COPY --chown=appuser Gemfile.lock .
+COPY --chown=appuser --from=builder /usr/local/bundle/ /usr/local/bundle/
+COPY --chown=appuser --from=builder /app/vendor/ /app/vendor/
+
+# Copy app files
 RUN mkdir ./storage
-COPY config.ru .
-COPY Rakefile .
-COPY app ./app
-COPY bin ./bin
-COPY config ./config
-COPY db ./db
-COPY lib ./lib
+COPY --chown=appuser config.ru .
+COPY --chown=appuser Rakefile .
+COPY --chown=appuser app ./app
+COPY --chown=appuser bin ./bin
+COPY --chown=appuser config ./config
+COPY --chown=appuser db ./db
+COPY --chown=appuser lib ./lib
 
-COPY entrypoint.sh /usr/bin/
+# Prepare entrypoint
+COPY --chown=appuser entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
