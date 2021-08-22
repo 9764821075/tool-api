@@ -41,11 +41,17 @@ RUN apk update \
  && rm -rf /var/lib/apt/lists/*
 
 # Add non-root user
-RUN addgroup -S appgroup \
- && adduser -S appuser -G appgroup
+RUN addgroup -S appuser \
+ && adduser -S appuser -G appuser
 
-USER appuser
 WORKDIR /app
+
+# Create file tmp and storage folder
+RUN mkdir ./tmp
+RUN mkdir ./storage
+
+RUN chown -R appuser /app
+USER appuser
 
 ENV LANG=C.UTF-8
 ENV RAILS_ENV=production
@@ -59,7 +65,6 @@ COPY --chown=appuser --from=builder /usr/local/bundle/ /usr/local/bundle/
 COPY --chown=appuser --from=builder /app/vendor/ /app/vendor/
 
 # Copy app files
-RUN mkdir ./storage
 COPY --chown=appuser config.ru .
 COPY --chown=appuser Rakefile .
 COPY --chown=appuser app ./app
